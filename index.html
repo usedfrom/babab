@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voice Flight: Inferno Edition</title>
+    <title>Voice Sprint: Among Us</title>
     <style>
         body {
             margin: 0;
@@ -78,12 +78,19 @@
             text-shadow: 0 0 10px #ffa502;
         }
 
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
         button {
             background: linear-gradient(45deg, #ff4757, #ff6b81);
             border: none;
             padding: 20px 60px;
             color: white;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 900;
             border-radius: 50px;
             cursor: pointer;
@@ -93,6 +100,7 @@
             letter-spacing: 2px;
             position: relative;
             overflow: hidden;
+            min-width: 350px;
         }
 
         button::after {
@@ -118,6 +126,15 @@
             box-shadow: 0 0 10px rgba(255, 71, 87, 0.8);
         }
 
+        .mode-2 {
+            background: linear-gradient(45deg, #00d2d3, #00a8a8);
+            box-shadow: 0 0 20px rgba(0, 210, 211, 0.6);
+        }
+
+        .mode-2:active {
+            box-shadow: 0 0 10px rgba(0, 210, 211, 0.8);
+        }
+
         #score-display {
             position: absolute;
             top: 20px;
@@ -130,17 +147,17 @@
             font-family: 'Courier New', monospace;
         }
 
-        #speed-display {
+        #distance-display {
             position: absolute;
             top: 20px;
             left: 30px;
             font-size: 24px;
             font-weight: bold;
-            color: #ffa502;
-            text-shadow: 0 0 10px #ffa502;
+            color: #00d2d3;
+            text-shadow: 0 0 10px #00d2d3;
             z-index: 5;
             font-family: 'Courier New', monospace;
-            border: 2px solid #ffa502;
+            border: 2px solid #00d2d3;
             padding: 5px 15px;
             border-radius: 5px;
             background: rgba(0,0,0,0.5);
@@ -171,23 +188,51 @@
             transition: background 0.1s;
         }
 
-        .warning {
+        .power-bar-container {
             position: absolute;
-            top: 50%;
+            bottom: 80px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff4757;
-            font-size: 40px;
-            font-weight: bold;
-            text-shadow: 0 0 20px #ff4757;
-            animation: pulse 0.5s infinite;
-            display: none;
-            z-index: 20;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 20px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 5;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+        .power-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #2ed573, #ffa502, #ff4757);
+            transition: width 0.1s;
+        }
+
+        .power-text {
+            position: absolute;
+            bottom: 105px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 5;
+        }
+
+        .mode-indicator {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffa502;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ffa502;
+            z-index: 5;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 20px;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -197,57 +242,63 @@
     
     <div id="ui-layer">
         <div id="score-display">0000</div>
-        <div id="speed-display">SPD: 1x</div>
+        <div id="distance-display">0м</div>
+        <div class="mode-indicator" id="mode-indicator">Механика: ПРЫЖКИ</div>
+        <div class="power-text">СИЛА КРИКА</div>
+        <div class="power-bar-container">
+            <div class="power-bar" id="power-bar"></div>
+        </div>
         <div id="mic-status">
             <div class="mic-dot" id="mic-dot"></div>
             <span id="mic-text">Ожидание...</span>
         </div>
-        <div class="warning" id="warning-text">⚠️ ОПАСНОСТЬ ⚠️</div>
     </div>
 
     <div id="start-screen">
-        <h1>Voice Flight</h1>
+        <h1>Voice Sprint</h1>
         <p>
-            1. Нажми <span class="highlight">СТАРТ</span> и разреши микрофон.<br>
-            2. <span class="highlight">ОРИ</span> чтобы лететь вверх.<br>
-            3. <span class="highlight">МОЛЧИ</span> чтобы падать.<br>
-            4. Уклоняйся от <span class="highlight">ОГНЕННЫХ БЛОКОВ</span>!<br>
-            5. Некоторые блоки <span class="highlight">ВЫДВИГАЮТСЯ</span>!<br>
-            6. Скорость растет каждые 10 сек.
+            Выберите режим игры:<br><br>
+            <span class="highlight">МЕХАНИКА 1</span> - Прыжки вверх<br>
+            Крик = высокий прыжок вверх<br><br>
+            <span class="highlight">МЕХАНИКА 2</span> - Полёт с ускорением<br>
+            Крик = полёт вперёд и вверх<br>
+            Скорость набирается со временем!
         </p>
-        <button id="start-btn">ЗАПУСК</button>
+        <div class="button-container">
+            <button id="start-btn-1">🚀 ЗАПУСК (ПРЫЖКИ)</button>
+            <button id="start-btn-2" class="mode-2">✈️ ЗАПУСК (ПОЛЁТ)</button>
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreEl = document.getElementById('score-display');
-        const speedEl = document.getElementById('speed-display');
+        const distanceEl = document.getElementById('distance-display');
         const startScreen = document.getElementById('start-screen');
-        const startBtn = document.getElementById('start-btn');
+        const startBtn1 = document.getElementById('start-btn-1');
+        const startBtn2 = document.getElementById('start-btn-2');
         const micDot = document.getElementById('mic-dot');
         const micText = document.getElementById('mic-text');
-        const warningText = document.getElementById('warning-text');
+        const powerBar = document.getElementById('power-bar');
+        const modeIndicator = document.getElementById('mode-indicator');
 
         let width, height;
         let gameRunning = false;
         let score = 0;
         let frames = 0;
+        let cameraX = 0;
+        let groundY = 0;
+        let gameMode = 1; // 1 = прыжки, 2 = полёт
         
-        let baseGameSpeed = 7;
-        let gameSpeed = baseGameSpeed;
-        
-        let speedLevel = 1;
-        const MAX_SPEED_LEVEL = 5;
-        const SPEED_INTERVAL = 600; 
-
         const player = {
             x: 100,
             y: 0,
             w: 70,
             h: 90,
+            vx: 0,
             vy: 0,
-            isGrounded: false,
+            isGrounded: true,
             legFrame: 0,
             tilt: 0,
             squash: 1,
@@ -260,15 +311,35 @@
         let stars = [];
         let fireParticles = [];
 
+        // === ФИЗИКА ДЛЯ МЕХАНИКИ 1 (ПРЫЖКИ) ===
+        const JUMP_GRAVITY = 0.6;
+        const JUMP_LIFT_POWER = 1.3;
+        const JUMP_FORWARD_POWER = 0.25;
+        const JUMP_FRICTION = 0.97;
+        const JUMP_MAX_SPEED_X = 12;
+        const JUMP_MAX_SPEED_Y = 16;
+
+        // === ФИЗИКА ДЛЯ МЕХАНИКИ 2 (ПОЛЁТ) ===
+        const FLIGHT_GRAVITY = 0.5;
+        const FLIGHT_LIFT_POWER = 0.9;
+        const FLIGHT_FORWARD_POWER = 0.4;
+        const FLIGHT_FRICTION = 0.98;
+        const FLIGHT_MAX_SPEED_X = 18;
+        const FLIGHT_MAX_SPEED_Y = 15;
+        const FLIGHT_ACCELERATION = 0.002; // Ускорение со временем
+
         // Аудио
         let audioContext, analyser, microphone, dataArray;
-        let volumeThreshold = 25; 
+        let currentVolume = 0;
+        let smoothVolume = 0;
+        const MIN_VOLUME = 8;
 
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
+            groundY = height - 150;
             initStars();
         }
         window.addEventListener('resize', resize);
@@ -276,9 +347,9 @@
 
         function initStars() {
             stars = [];
-            for(let i=0; i<100; i++) {
+            for(let i=0; i<150; i++) {
                 stars.push({
-                    x: Math.random() * width,
+                    x: Math.random() * width * 2,
                     y: Math.random() * height,
                     size: Math.random() * 2 + 0.5,
                     speed: Math.random() * 0.5 + 0.1
@@ -316,56 +387,64 @@
             return sum / dataArray.length;
         }
 
-        function resetGame() {
-            player.y = height / 2; 
+        function resetGame(mode) {
+            gameMode = mode;
+            
+            player.x = 100;
+            player.y = groundY - player.h;
+            player.vx = 0;
             player.vy = 0;
-            player.isGrounded = false;
+            player.isGrounded = true;
             player.squash = 1;
             player.stretch = 1;
+            player.tilt = 0;
+            
             platforms = [];
             obstacles = [];
             particles = [];
             fireParticles = [];
+            cameraX = 0;
             
-            speedLevel = 1;
-            gameSpeed = baseGameSpeed;
-            updateSpeedDisplay();
-
-            platforms.push({ x: 0, y: height - 150, w: width + 200, h: 150 });
+            // Стартовая платформа
+            platforms.push({ x: -500, y: groundY, w: 1000, h: 200 });
+            
             score = 0;
             scoreEl.innerText = "0000";
             frames = 0;
             gameRunning = true;
+            
+            // Обновляем индикатор режима
+            if (mode === 1) {
+                modeIndicator.innerText = "МЕХАНИКА: ПРЫЖКИ";
+                modeIndicator.style.color = "#ff4757";
+            } else {
+                modeIndicator.innerText = "МЕХАНИКА: ПОЛЁТ С УСКОРЕНИЕМ";
+                modeIndicator.style.color = "#00d2d3";
+            }
+            
+            // Генерируем платформы
+            let platformX = 500;
+            for(let i=0; i<15; i++) {
+                generatePlatform(platformX);
+                const lastP = platforms[platforms.length - 1];
+                platformX = lastP.x + lastP.w + Math.random() * 150 + 80;
+            }
+            
             loop();
         }
 
-        function updateSpeedDisplay() {
-            speedEl.innerText = `SPD: ${speedLevel}x`;
-            if (speedLevel === MAX_SPEED_LEVEL) {
-                speedEl.style.color = '#ff4757';
-                speedEl.style.borderColor = '#ff4757';
-                speedEl.style.boxShadow = '0 0 15px #ff4757';
-            } else {
-                speedEl.style.color = '#ffa502';
-                speedEl.style.borderColor = '#ffa502';
-                speedEl.style.boxShadow = 'none';
-            }
-        }
-
-        function createPlatform() {
-            const lastP = platforms[platforms.length - 1];
-            const gap = Math.random() * 200 + 150; 
-            const w = Math.random() * 400 + 200;   
+        function generatePlatform(xPos) {
+            const w = Math.random() * 250 + 200;
             
             platforms.push({
-                x: lastP.x + lastP.w + gap,
-                y: height - 150,
+                x: xPos,
+                y: groundY,
                 w: w,
-                h: 150
+                h: 200
             });
 
-            if (Math.random() > 0.3) {
-                createObstacle(lastP.x + lastP.w + gap + w);
+            if (Math.random() > 0.5) {
+                createObstacle(xPos + w + 80);
             }
         }
 
@@ -373,13 +452,13 @@
             const type = Math.random() > 0.5 ? 'top' : 'bottom';
             const w = 80; 
             const baseH = Math.random() * 100 + 100;
-            const isMoving = Math.random() > 0.6; // 40% шанс что блок выдвижной
+            const isMoving = Math.random() > 0.6;
             
             let y;
             if (type === 'top') {
                 y = 0; 
             } else {
-                y = height - 150 - baseH; 
+                y = groundY - baseH; 
             }
 
             obstacles.push({
@@ -391,7 +470,7 @@
                 currentH: isMoving ? 0 : baseH,
                 type: type,
                 isMoving: isMoving,
-                extendPhase: 0, // 0 = скрыт, 1 = выдвигается, 2 = полностью выдвинут, 3 = убирается
+                extendPhase: 0,
                 warningShown: false
             });
         }
@@ -400,7 +479,7 @@
             particles.push({
                 x: x,
                 y: y + Math.random() * 30,
-                vx: -gameSpeed - Math.random() * 5 - 2,
+                vx: -Math.random() * 5 - 2,
                 vy: (Math.random() - 0.5) * 3,
                 life: 1.0,
                 size: Math.random() * 10 + 5,
@@ -409,8 +488,7 @@
         }
 
         function createObstacleFire(x, y, w, h) {
-            // Частицы огня от препятствий
-            for(let i=0; i<3; i++) {
+            for(let i=0; i<2; i++) {
                 fireParticles.push({
                     x: x + Math.random() * w,
                     y: y + (Math.random() > 0.5 ? 0 : h),
@@ -427,101 +505,161 @@
             if (!gameRunning) return;
             frames++;
 
-            // Ускорение
-            if (frames % SPEED_INTERVAL === 0 && speedLevel < MAX_SPEED_LEVEL) {
-                speedLevel++;
-                gameSpeed += 2; 
-                updateSpeedDisplay();
-            }
-
             const vol = getVolume();
-            const isScreaming = vol > volumeThreshold;
+            smoothVolume = smoothVolume * 0.8 + vol * 0.2;
+            currentVolume = smoothVolume;
+            
+            const isScreaming = smoothVolume > MIN_VOLUME;
 
-            // Индикатор микрофона
+            // UI
+            const powerPercent = Math.min((smoothVolume / 50) * 100, 100);
+            powerBar.style.width = powerPercent + '%';
+            
             if (isScreaming) {
                 micDot.style.background = '#2ed573';
                 micDot.style.boxShadow = '0 0 10px #2ed573';
-                micDot.style.transform = `scale(${1 + vol/50})`;
+                micDot.style.transform = `scale(${1 + smoothVolume/30})`;
             } else {
                 micDot.style.background = '#555';
                 micDot.style.boxShadow = 'none';
                 micDot.style.transform = 'scale(1)';
             }
 
-            // Физика
-            if (isScreaming) {
-                player.vy -= 1.2;
-                player.tilt = -0.15; 
-                player.stretch = 1.1;
-                player.squash = 0.9;
-                if (frames % 2 === 0) createFire(player.x, player.y + player.h * 0.7);
+            // === ПРИМЕНЯЕМ ФИЗИКУ В ЗАВИСИМОСТИ ОТ РЕЖИМА ===
+            let GRAVITY, LIFT_POWER, FORWARD_POWER, FRICTION, MAX_SPEED_X, MAX_SPEED_Y;
+            
+            if (gameMode === 1) {
+                // МЕХАНИКА 1: ПРЫЖКИ
+                GRAVITY = JUMP_GRAVITY;
+                LIFT_POWER = JUMP_LIFT_POWER;
+                FORWARD_POWER = JUMP_FORWARD_POWER;
+                FRICTION = JUMP_FRICTION;
+                MAX_SPEED_X = JUMP_MAX_SPEED_X;
+                MAX_SPEED_Y = JUMP_MAX_SPEED_Y;
             } else {
-                player.tilt = 0.05; 
+                // МЕХАНИКА 2: ПОЛЁТ С УСКОРЕНИЕМ
+                GRAVITY = FLIGHT_GRAVITY;
+                LIFT_POWER = FLIGHT_LIFT_POWER;
+                FORWARD_POWER = FLIGHT_FORWARD_POWER;
+                FRICTION = FLIGHT_FRICTION;
+                MAX_SPEED_X = FLIGHT_MAX_SPEED_X + (frames * FLIGHT_ACCELERATION);
+                MAX_SPEED_Y = FLIGHT_MAX_SPEED_Y;
+            }
+
+            // Физика полёта/прыжка
+            if (isScreaming) {
+                const normalizedVolume = Math.min(smoothVolume / 50, 1);
+                
+                player.vy -= LIFT_POWER * normalizedVolume;
+                player.vx += FORWARD_POWER * normalizedVolume;
+                
+                player.isGrounded = false;
+                player.tilt = -0.2;
+                player.stretch = 1.05;
+                player.squash = 0.95;
+                
+                if (frames % 2 === 0) {
+                    createFire(player.x, player.y + player.h * 0.7);
+                }
+            } else {
+                player.tilt = 0.05;
                 player.stretch = 1;
                 player.squash = 1;
             }
 
-            player.vy += 0.6;
+            player.vy += GRAVITY;
+            player.vx *= FRICTION;
 
-            if (player.vy > 15) player.vy = 15;
-            if (player.vy < -15) player.vy = -15;
+            if (player.vy > MAX_SPEED_Y) player.vy = MAX_SPEED_Y;
+            if (player.vy < -MAX_SPEED_Y) player.vy = -MAX_SPEED_Y;
+            if (player.vx > MAX_SPEED_X) player.vx = MAX_SPEED_X;
+            if (player.vx < 0) player.vx = 0;
 
+            player.x += player.vx;
             player.y += player.vy;
+
+            // Камера
+            const targetCameraX = player.x - width * 0.3;
+            cameraX += (targetCameraX - cameraX) * 0.1;
 
             // Потолок
             if (player.y < 0) {
                 player.y = 0;
                 player.vy = 0;
                 player.tilt = 0.2;
-                player.squash = 0.8;
-                player.stretch = 1.2;
+            }
+
+            // Коллизия
+            player.isGrounded = false;
+            
+            for (let p of platforms) {
+                const playerLeft = player.x + player.w * 0.25;
+                const playerRight = player.x + player.w * 0.75;
+                const playerBottom = player.y + player.h;
+                
+                if (playerRight > p.x && playerLeft < p.x + p.w) {
+                    if (playerBottom >= p.y - 10 && playerBottom <= p.y + 25) {
+                        if (player.vy >= 0) {
+                            player.y = p.y - player.h;
+                            player.vy = 0;
+                            player.isGrounded = true;
+                            player.tilt = 0;
+                            
+                            if (player.squash > 0.95) {
+                                player.squash = 0.8;
+                                player.stretch = 1.2;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Смерть
+            if (player.y > height + 100) {
+                gameOver();
+                return;
             }
 
             // Звезды
             stars.forEach(star => {
-                star.x -= star.speed * (gameSpeed / 5);
-                if (star.x < 0) star.x = width;
+                star.x -= player.vx * 0.3;
+                if (star.x < cameraX - 100) star.x = cameraX + width + 100;
             });
 
-            // Платформы
-            for (let i = 0; i < platforms.length; i++) {
-                platforms[i].x -= gameSpeed;
+            // Генерация платформ
+            const lastPlatform = platforms[platforms.length - 1];
+            if (lastPlatform.x + lastPlatform.w < cameraX + width + 500) {
+                const newX = lastPlatform.x + lastPlatform.w + Math.random() * 150 + 80;
+                generatePlatform(newX);
             }
 
-            // Препятствия с анимацией выдвижения
-            warningText.style.display = 'none';
-            
+            // Удаление
+            if (platforms[0].x + platforms[0].w < cameraX - 400) {
+                platforms.shift();
+                score++;
+                scoreEl.innerText = score.toString().padStart(4, '0');
+            }
+
+            // Препятствия
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 let obs = obstacles[i];
-                obs.x -= gameSpeed;
 
-                // Анимация выдвижного блока
                 if (obs.isMoving) {
                     const distanceToPlayer = (player.x + player.w) - obs.x;
                     
-                    // Когда игрок приближается (за 400 пикселей)
                     if (distanceToPlayer < 400 && distanceToPlayer > 0 && obs.extendPhase < 2) {
-                        if (obs.extendPhase === 0) {
-                            obs.extendPhase = 1; // Начинает выдвигаться
-                        }
+                        if (obs.extendPhase === 0) obs.extendPhase = 1;
                         
-                        // Выдвижение
                         if (obs.extendPhase === 1) {
-                            obs.currentH += 8; // Скорость выдвижения
+                            obs.currentH += 8;
                             if (obs.currentH >= obs.targetH) {
                                 obs.currentH = obs.targetH;
                                 obs.extendPhase = 2;
                             }
-                            
-                            // Показываем предупреждение
-                            if (!obs.warningShown && obs.currentH > obs.h / 2) {
-                                obs.warningShown = true;
-                                warningText.style.display = 'block';
-                            }
                         }
                     }
                     
-                    // Блок начинает убираться когда игрок прошел
                     if (distanceToPlayer < -100 && obs.extendPhase === 2) {
                         obs.extendPhase = 3;
                     }
@@ -537,10 +675,9 @@
                     obs.currentH = obs.h;
                 }
 
-                // Коллизия с учетом текущей высоты
-                const padding = 15;
-                const obsHeight = obs.type === 'top' ? obs.currentH : obs.currentH;
-                const obsY = obs.type === 'top' ? obs.y : (height - 150 - obs.currentH);
+                const padding = 12;
+                const obsHeight = obs.currentH;
+                const obsY = obs.type === 'top' ? obs.y : (groundY - obs.currentH);
                 
                 if (player.x + player.w - padding > obs.x && 
                     player.x + padding < obs.x + obs.w &&
@@ -550,45 +687,19 @@
                     return;
                 }
 
-                // Частицы огня от препятствий
                 if (frames % 5 === 0) {
                     createObstacleFire(obs.x, obsY, obs.w, obsHeight);
                 }
 
-                if (obs.x + obs.w < 0) obstacles.splice(i, 1);
-            }
-
-            if (platforms[0].x + platforms[0].w < -100) {
-                platforms.shift();
-                score++;
-                scoreEl.innerText = score.toString().padStart(4, '0');
-            }
-            if (platforms[platforms.length - 1].x < width) {
-                createPlatform();
-            }
-
-            // Земля
-            player.isGrounded = false;
-            for (let p of platforms) {
-                if (player.x + player.w * 0.3 > p.x && 
-                    player.x + player.w * 0.7 < p.x + p.w &&
-                    player.y + player.h >= p.y &&
-                    player.y + player.h <= p.y + player.vy + 20) {
-                    
-                    player.y = p.y - player.h;
-                    player.vy = 0;
-                    player.isGrounded = true;
-                    player.tilt = 0;
-                    if (Math.abs(player.vy) > 5) {
-                        player.squash = 0.7;
-                        player.stretch = 1.3;
-                    }
+                if (obs.x + obs.w < cameraX - 200) {
+                    obstacles.splice(i, 1);
                 }
             }
 
-            if (player.y > height) gameOver();
+            const distance = Math.floor(player.x / 10);
+            distanceEl.innerText = distance + 'м';
 
-            // Частицы игрока
+            // Частицы
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.x += p.vx;
@@ -598,7 +709,6 @@
                 if (p.life <= 0) particles.splice(i, 1);
             }
             
-            // Частицы препятствий
             for (let i = fireParticles.length - 1; i >= 0; i--) {
                 let p = fireParticles[i];
                 p.x += p.vx;
@@ -610,6 +720,10 @@
             
             player.squash += (1 - player.squash) * 0.1;
             player.stretch += (1 - player.stretch) * 0.1;
+            
+            if (!player.isGrounded) {
+                player.tilt += (0.05 - player.tilt) * 0.05;
+            }
         }
 
         function drawAmogus(x, y, w, h) {
@@ -625,11 +739,11 @@
 
             let legOffsetL = 0;
             let legOffsetR = 0;
-            if (player.isGrounded) {
-                player.legFrame += 0.4 + (gameSpeed/20);
+            if (player.isGrounded && player.vx > 0.5) {
+                player.legFrame += 0.4 + (player.vx/5);
                 legOffsetL = Math.sin(player.legFrame) * 15;
                 legOffsetR = Math.sin(player.legFrame + Math.PI) * 15;
-            } else {
+            } else if (!player.isGrounded) {
                 legOffsetL = -5;
                 legOffsetR = 5;
             }
@@ -639,13 +753,11 @@
             const visorColor = '#74b9ff';
             const visorDark = '#0984e3';
 
-            // Рюкзак
             ctx.fillStyle = bodyDark;
             ctx.fillRect(x - 15, y + h * 0.35, 18, h * 0.35);
             ctx.fillStyle = bodyColor;
             ctx.fillRect(x - 12, y + h * 0.35, 12, h * 0.35);
 
-            // Ноги
             ctx.fillStyle = bodyColor;
             ctx.strokeStyle = bodyDark;
             ctx.lineWidth = 2;
@@ -660,7 +772,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Тело
             ctx.fillStyle = bodyColor;
             ctx.strokeStyle = bodyDark;
             ctx.lineWidth = 3;
@@ -679,7 +790,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Блик на теле
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
             ctx.beginPath();
             ctx.moveTo(x + 25, y + h * 0.2);
@@ -688,7 +798,6 @@
             ctx.quadraticCurveTo(x + 25, y + h * 0.2, x + 25, y + h * 0.2);
             ctx.fill();
 
-            // Визор
             ctx.fillStyle = visorColor;
             ctx.strokeStyle = visorDark;
             ctx.lineWidth = 2;
@@ -707,13 +816,11 @@
         }
 
         function drawObstacle(obs) {
-            const obsY = obs.type === 'top' ? obs.y : (height - 150 - obs.currentH);
+            const obsY = obs.type === 'top' ? obs.y : (groundY - obs.currentH);
             
-            // Свечение вокруг препятствия
             ctx.shadowBlur = 20 + Math.sin(frames * 0.1) * 10;
             ctx.shadowColor = '#ff4757';
             
-            // Основной блок с градиентом огня
             const gradient = ctx.createLinearGradient(obs.x, obsY, obs.x + obs.w, obsY + obs.currentH);
             gradient.addColorStop(0, '#ff4757');
             gradient.addColorStop(0.3, '#ff6b81');
@@ -725,15 +832,12 @@
             
             ctx.shadowBlur = 0;
             
-            // Внутреннее свечение
             ctx.fillStyle = 'rgba(255, 100, 50, 0.6)';
             ctx.fillRect(obs.x + 8, obsY + 8, obs.w - 16, obs.currentH - 16);
             
-            // Ядро (самое горячее)
             ctx.fillStyle = 'rgba(255, 255, 200, 0.8)';
             ctx.fillRect(obs.x + 20, obsY + 20, obs.w - 40, obs.currentH - 40);
             
-            // Полосы опасности (анимированные)
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
             ctx.lineWidth = 3;
             const stripeOffset = (frames * 3) % 30;
@@ -744,19 +848,16 @@
             }
             ctx.stroke();
             
-            // Контур
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 2;
             ctx.strokeRect(obs.x, obsY, obs.w, obs.currentH);
             
-            // Индикатор для выдвижных блоков
             if (obs.isMoving) {
                 ctx.fillStyle = obs.extendPhase === 1 ? '#ffa502' : '#ff4757';
                 ctx.beginPath();
                 ctx.arc(obs.x + obs.w/2, obsY + (obs.type === 'top' ? obs.currentH - 10 : 10), 8, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Пульсация
                 ctx.strokeStyle = 'white';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
@@ -766,7 +867,6 @@
         }
 
         function draw() {
-            // Фон
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
             gradient.addColorStop(0, "#0f0c29");
             gradient.addColorStop(0.5, "#302b63");
@@ -774,70 +874,82 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
 
-            // Звезды
             ctx.fillStyle = 'white';
             stars.forEach(star => {
-                ctx.globalAlpha = Math.random() * 0.5 + 0.3;
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
-                ctx.fill();
+                const screenX = star.x - cameraX * 0.5;
+                if (screenX > -50 && screenX < width + 50) {
+                    ctx.globalAlpha = Math.random() * 0.5 + 0.3;
+                    ctx.beginPath();
+                    ctx.arc(screenX, star.y, star.size, 0, Math.PI*2);
+                    ctx.fill();
+                }
             });
             ctx.globalAlpha = 1.0;
 
-            // Сетка
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
             ctx.lineWidth = 1;
-            const gridOffset = (frames * gameSpeed * 0.5) % 100;
-            for(let i=0; i<width; i+=100) {
+            const gridOffset = (cameraX * 0.5) % 100;
+            for(let i=0; i<width + 200; i+=100) {
                 ctx.beginPath();
                 ctx.moveTo(i - gridOffset, 0);
                 ctx.lineTo(i - gridOffset, height);
                 ctx.stroke();
             }
 
-            // Платформы
+            ctx.save();
+            ctx.translate(-cameraX, 0);
+
             for (let p of platforms) {
-                ctx.fillStyle = '#2f3542';
-                ctx.fillRect(p.x, p.y, p.w, p.h);
-                
-                ctx.fillStyle = '#00d2d3';
-                ctx.fillRect(p.x, p.y, p.w, 5);
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#00d2d3';
-                ctx.fillRect(p.x, p.y, p.w, 2);
-                ctx.shadowBlur = 0;
-                
-                ctx.fillStyle = '#57606f';
-                ctx.fillRect(p.x + 20, p.y + 20, 10, 10);
-                ctx.fillRect(p.x + p.w - 40, p.y + 20, 10, 10);
+                if (p.x + p.w > cameraX - 100 && p.x < cameraX + width + 100) {
+                    ctx.fillStyle = '#2f3542';
+                    ctx.fillRect(p.x, p.y, p.w, p.h);
+                    
+                    ctx.fillStyle = '#00d2d3';
+                    ctx.fillRect(p.x, p.y, p.w, 5);
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00d2d3';
+                    ctx.fillRect(p.x, p.y, p.w, 2);
+                    ctx.shadowBlur = 0;
+                    
+                    ctx.fillStyle = '#57606f';
+                    ctx.fillRect(p.x + 20, p.y + 20, 10, 10);
+                    ctx.fillRect(p.x + p.w - 40, p.y + 20, 10, 10);
+                }
             }
 
-            // Препятствия
             for (let obs of obstacles) {
-                drawObstacle(obs);
+                if (obs.x + obs.w > cameraX - 100 && obs.x < cameraX + width + 100) {
+                    drawObstacle(obs);
+                }
             }
 
-            // Частицы игрока
             for (let p of particles) {
-                ctx.globalAlpha = p.life;
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
+                const screenX = p.x - cameraX;
+                if (screenX > -50 && screenX < width + 50) {
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(screenX, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
+            ctx.globalAlpha = 1.0;
             
-            // Частицы препятствий
             for (let p of fireParticles) {
-                ctx.globalAlpha = p.life;
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
+                const screenX = p.x - cameraX;
+                if (screenX > -50 && screenX < width + 50) {
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(screenX, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
+            ctx.globalAlpha = 1.0;
 
             drawAmogus(player.x, player.y, player.w, player.h);
+
+            ctx.restore();
         }
 
         function loop() {
@@ -850,15 +962,27 @@
         function gameOver() {
             gameRunning = false;
             startScreen.style.display = 'flex';
-            document.querySelector('#start-screen h1').innerText = "МИССИЯ ПРОВАЛЕНА";
-            document.querySelector('#start-screen p').innerHTML = `Счет: <span class="highlight">${score}</span><br>Уровень скорости: ${speedLevel}`;
-            startBtn.innerText = "ПОВТОРИТЬ";
+            const distance = Math.floor(player.x / 10);
+            document.querySelector('#start-screen h1').innerText = "ФИНИШ!";
+            document.querySelector('#start-screen p').innerHTML = 
+                `Дистанция: <span class="highlight">${distance}м</span><br>
+                 Препятствий пройдено: ${score}<br>
+                 Режим: ${gameMode === 1 ? 'ПРЫЖКИ' : 'ПОЛЁТ'}`;
+            startBtn1.innerText = "🚀 ЕЩЁ РАЗ (ПРЫЖКИ)";
+            startBtn2.innerText = "✈️ ЕЩЁ РАЗ (ПОЛЁТ)";
         }
 
-        startBtn.addEventListener('click', async () => {
+        startBtn1.addEventListener('click', async () => {
             startScreen.style.display = 'none';
             const ok = await initAudio();
-            if (ok) resetGame();
+            if (ok) resetGame(1);
+            else startScreen.style.display = 'flex';
+        });
+
+        startBtn2.addEventListener('click', async () => {
+            startScreen.style.display = 'none';
+            const ok = await initAudio();
+            if (ok) resetGame(2);
             else startScreen.style.display = 'flex';
         });
 
